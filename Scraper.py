@@ -1,30 +1,46 @@
 __author__ = 'Michael'
+# Thanks to http://www.toptal.com/python/beginners-guide-to-concurrency-and-parallelism-in-python
 
 import urllib.request
 import os
+from pathlib import Path
+from multiprocessing.pool import Pool
 
-home = os.getcwd()
 
-for i in range(1, 6):
-    os.makedirs(os.getcwd() + "/Volume " + str(i))
-    os.chdir(os.getcwd() + "/Volume " + str(i))
+def main():
+    home = os.getcwd()
+    for i in range(1, 6):
+        download_dir = Path(os.getcwd() + "/Volume " + str(i))
+        if not download_dir.exists():
+            download_dir.mkdir()
+        os.chdir(download_dir.name)
 
-    url = "http://carciphona.com/_pages//" + str(i) + "/cover.jpg"
+        cover_url = "http://carciphona.com/_pages//" + str(i) + "/cover.jpg"
+        download_file(cover_url)
 
-    urllib.request.urlretrieve(url, "cover" + str(i) + ".jpg")
+        urls = []
+        for j in range(1, 200):
+            urls.append("http://carciphona.com/_pages//" + str(i) + "/" + str(j).zfill(3) + ".jpg")
 
-    print("Cover " + str(i) + " retrieved!")
+        # 2x as many processes as I have processors for better performance on more powerful systems, and because I may
+        # get more speedup by utilising the time spent waiting for the website to respond.
+        # Might not actually help though.
+        with Pool(12) as p:
+            p.map(download_file, urls)
 
-    for j in range(1, 200):
-        url = "http://carciphona.com/_pages//" + str(i) + "/" + str(j).zfill(3) + ".jpg"
-        path = str(j).zfill(3) + ".jpg"
+        os.chdir(home)
 
-        urllib.request.urlretrieve(url, path)
 
-        if os.path.getsize(path) < 25 * 1024:
-            os.remove(path)
-            print("Page " + str(j) + " of chapter " + str(i) + " does not exist, temp file deleted!")
-        else:
-            print("Page " + str(j) + " of chapter " + str(i) + " retrieved!")
+def download_file(url):
+    filename = url.split("/")[-1]
+    chapter = url.split("/")[-2]
+    urllib.request.urlretrieve(url, filename)
 
-    os.chdir(home)
+    if os.path.getsize(filename) < 25 * 1024:
+        os.remove(filename)
+        print("Page " + filename + " of chapter " + chapter + " does not exist, temp file removed.")
+    else:
+        print("Page " + filename + " of chapter " + chapter + " retrieved!")
+
+if __name__ == "__main__":
+    main()
