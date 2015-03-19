@@ -11,6 +11,7 @@ def main():
     home = os.getcwd()
     for i in range(1, 6):
         download_dir = Path(os.getcwd() + "/Volume " + str(i))
+
         if not download_dir.exists():
             download_dir.mkdir()
         os.chdir(download_dir.name)
@@ -33,14 +34,14 @@ def main():
 
 def download_file(url):
     filename = url.split("/")[-1]
-    chapter = url.split("/")[-2]
+    volume = url.split("/")[-2]
     urllib.request.urlretrieve(url, filename)
 
     if os.path.getsize(filename) < 25 * 1024:
         os.remove(filename)
-        print("Page " + filename + " of chapter " + chapter + " does not exist, temp file removed.")
+        print("Page " + filename + " of volume " + volume + " does not exist, temp file removed.")
     else:
-        print("Page " + filename + " of chapter " + chapter + " retrieved!")
+        print("Page " + filename + " of volume " + volume + " retrieved!")
 
 if __name__ == "__main__":
     main()
