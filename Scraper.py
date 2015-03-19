@@ -15,7 +15,7 @@ def main():
             download_dir.mkdir()
         os.chdir(download_dir.name)
 
-        cover_url = "http://carciphona.com/_pages//" + str(i) + "/cover.jpg"
+        cover_url = "http://carciphona.com/_pages//" + str(i) + "/000.jpg"
         download_file(cover_url)
 
         urls = []
