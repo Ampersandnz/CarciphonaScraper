@@ -9,7 +9,7 @@ from multiprocessing.pool import Pool
 def main():
     for i in range(1, 6):
 
-        cover_url = "http://carciphona.com/_pages//" + str(i) + "/000.jpg"
+        cover_url = "http://carciphona.com/_pages//" + str(i) + "/cover.jpg"
         download_file(cover_url)
 
         urls = []
